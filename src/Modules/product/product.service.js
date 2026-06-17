@@ -63,3 +63,8 @@ export async function deleteProduct(id) {
     await deleteOne(ProductModel, { _id: id })
     return product
 }
+
+export async function getPublicProducts() {
+    const products = await ProductModel.find({ isActive: true }).populate('category');
+    return products;
+}

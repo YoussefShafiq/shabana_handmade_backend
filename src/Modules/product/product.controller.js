@@ -1,6 +1,6 @@
 import { Router } from "express";
 import uploadLocal from "../../utils/Multer/multer.config.js";
-import { createProduct, deleteProduct, getAllProducts, toggleActivation, updateProduct } from "./product.service.js";
+import { createProduct, deleteProduct, getAllProducts, getPublicProducts, toggleActivation, updateProduct } from "./product.service.js";
 import { createProductSchema, deleteProductSchema, updateProductSchema } from "../../utils/validationSchemas/product.schema.js";
 import { validation } from "../../Middlewares/validation.middleware.js";
 import { authentication } from "../../Middlewares/authentication.middleware.js";
@@ -16,6 +16,11 @@ productRouter.post('', authentication(), uploadLocal('images').array('images', 1
 
 productRouter.get('', authentication(), async (req, res) => {
     const products = await getAllProducts()
+    return successResponse({ res, data: products, message: 'Products fetched successfully', statusCode: 200 })
+})
+
+productRouter.get('/public', async (req, res) => {
+    const products = await getPublicProducts()
     return successResponse({ res, data: products, message: 'Products fetched successfully', statusCode: 200 })
 })
 
