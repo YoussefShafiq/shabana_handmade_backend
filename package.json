@@ -2,14 +2,14 @@
   "name": "assignment-6",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/main.js",
+  "main": "./src/app.js",
   "scripts": {
     "build": "npm run build:syntax && npm run build:dist",
-    "build:syntax": "node --check ./src/main.js",
+    "build:syntax": "node --check ./src/app.js",
     "build:dist": "node ./scripts/build-dist.mjs",
-    "start:dev": "cross-env NODE_ENV=dev node --watch ./src/main.js",
-    "start": "node ./src/main.js",
-    "start:prod": "cross-env NODE_ENV=prod node ./src/main.js"
+    "start:dev": "cross-env NODE_ENV=dev node --watch ./src/app.js",
+    "start": "node ./src/app.js",
+    "start:prod": "cross-env NODE_ENV=prod node ./src/app.js"
   },
   "keywords": [],
   "author": "",
