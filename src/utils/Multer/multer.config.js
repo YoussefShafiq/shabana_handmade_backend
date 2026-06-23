@@ -23,6 +23,13 @@ export function checkFilesLimit(folderName, limit = 4) {
     }
 }
 
+export function uploadMemory() {
+    return multer({
+        storage: multer.memoryStorage(),
+        limits: { fileSize: 10 * 1024 * 1024 },
+    })
+}
+
 export default function uploadLocal(folderName) {
 
     const destination = multer.diskStorage({

@@ -5,27 +5,11 @@ import { find, findById, findOne } from "../../DB/Repository/get.repo.js"
 import { insertOne } from "../../DB/Repository/insert.repo.js"
 import { findByIdAndUpdate } from "../../DB/Repository/update.repo.js"
 import { badRequestException, conflictException, notFoundException } from "../../utils/response/failResponse.js"
-import path from "node:path"
-import { existsSync, rmSync } from "node:fs"
+import { deleteStoredImage } from "../../utils/storage/imageStorage.js"
 
 function imageFileKey(imagePath) {
     if (!imagePath) return ''
     return imagePath.replace(/\\/g, '/').split('/').pop()
-}
-
-function resolveImageDiskPath(imagePath) {
-    if (!imagePath) return null
-    if (imagePath.startsWith('/uploads')) {
-        return path.resolve('.' + imagePath)
-    }
-    return path.resolve(imagePath)
-}
-
-function removeImageFile(imagePath) {
-    const diskPath = resolveImageDiskPath(imagePath)
-    if (diskPath && existsSync(diskPath)) {
-        rmSync(diskPath)
-    }
 }
 
 function findImageIndex(images, imagePath) {
@@ -125,7 +109,7 @@ export async function deleteProductImage(id, imagePath) {
     }
 
     const imageToDelete = images[imageIndex]
-    removeImageFile(imageToDelete)
+    await deleteStoredImage(imageToDelete)
 
     const updatedImages = images.filter((_, index) => index !== imageIndex)
     const updatedProduct = await findByIdAndUpdate(
@@ -144,7 +128,7 @@ export async function deleteProduct(id) {
     }
 
     for (const image of product.images || []) {
-        removeImageFile(image)
+        await deleteStoredImage(image)
     }
 
     await deleteOne(ProductModel, { _id: id })

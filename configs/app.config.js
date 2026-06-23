@@ -29,3 +29,5 @@ export const EMAIL_PASS = process.env.EMAIL_PASS || ''
 
 
 export const WEB_CLIENT_ID = process.env.WEB_CLIENT_ID || ''
+
+export const BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || ''
