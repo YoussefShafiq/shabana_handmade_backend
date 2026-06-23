@@ -12,6 +12,7 @@ import userRouter from "./Modules/User/user.controller.js";
 import { globalErrorHandling } from "./utils/response/failResponse.js";
 import { productRouter } from "./Modules/product/product.controller.js";
 import { categoryRouter } from "./Modules/category/category.controller.js";
+import mediaRouter from "./Modules/media/media.controller.js";
 
 
 
@@ -27,6 +28,7 @@ export default async function bootstrap() {
         helmet()
     )
     app.use('/uploads', express.static(path.resolve('./uploads')))
+    app.use('/media', mediaRouter)
     app.use('/auth', authRouter)
     app.use('/user', userRouter)
     app.use('/contact', contactRouter)
