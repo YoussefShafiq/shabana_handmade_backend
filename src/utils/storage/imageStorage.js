@@ -42,6 +42,24 @@ function sanitizeFileName(originalName) {
     return base.replace(/[^a-zA-Z0-9._-]/g, '_')
 }
 
+const EXT_TO_MIME = {
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.gif': 'image/gif',
+    '.webp': 'image/webp',
+    '.svg': 'image/svg+xml',
+    '.avif': 'image/avif',
+}
+
+function resolveMimeType(file) {
+    if (file.mimetype && file.mimetype !== 'application/octet-stream') {
+        return file.mimetype
+    }
+    const ext = path.extname(file.originalname || '').toLowerCase()
+    return EXT_TO_MIME[ext] || 'image/jpeg'
+}
+
 export function getPublicApiBase() {
     if (process.env.API_PUBLIC_URL) {
         return process.env.API_PUBLIC_URL.replace(/\/$/, '')
@@ -89,9 +107,10 @@ async function persistToGridFS(file, folder) {
     const fileName = `${folder}/${randomUUID()}_${sanitizeFileName(file.originalname)}`
 
     return new Promise((resolve, reject) => {
+        const contentType = resolveMimeType(file)
         const uploadStream = bucket.openUploadStream(fileName, {
-            contentType: file.mimetype || 'application/octet-stream',
-            metadata: { folder },
+            contentType,
+            metadata: { folder, contentType },
         })
 
         uploadStream.on('error', reject)
