@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import { v2 as cloudinary } from 'cloudinary'
 import { put, del } from '@vercel/blob'
 import { unhandledException } from '../response/failResponse.js'
+import { ensureDbConnection } from '../../DB/connection.js'
 
 const GRIDFS_BUCKET = 'productImages'
 
@@ -42,7 +43,7 @@ function sanitizeFileName(originalName) {
     return base.replace(/[^a-zA-Z0-9._-]/g, '_')
 }
 
-const EXT_TO_MIME = {
+export const EXT_TO_MIME = {
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
     '.png': 'image/png',
@@ -50,6 +51,21 @@ const EXT_TO_MIME = {
     '.webp': 'image/webp',
     '.svg': 'image/svg+xml',
     '.avif': 'image/avif',
+}
+
+export const MIME_TO_EXT = Object.fromEntries(
+    Object.entries(EXT_TO_MIME).map(([ext, mime]) => [mime, ext])
+)
+
+export function sniffImageMime(buffer) {
+    if (!buffer?.length) return 'image/jpeg'
+    if (buffer[0] === 0xff && buffer[1] === 0xd8) return 'image/jpeg'
+    if (buffer[0] === 0x89 && buffer[1] === 0x50) return 'image/png'
+    if (buffer[0] === 0x47 && buffer[1] === 0x49) return 'image/gif'
+    if (buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46) {
+        return 'image/webp'
+    }
+    return 'image/jpeg'
 }
 
 function resolveMimeType(file) {
@@ -64,8 +80,12 @@ export function getPublicApiBase() {
     if (process.env.API_PUBLIC_URL) {
         return process.env.API_PUBLIC_URL.replace(/\/$/, '')
     }
-    if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}`
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+        return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    }
+    const vercelUrl = process.env.VERCEL_URL || ''
+    if (vercelUrl && !vercelUrl.includes('-projects.vercel.app')) {
+        return `https://${vercelUrl}`
     }
     return ''
 }
@@ -103,6 +123,7 @@ async function persistToCloudinary(file, folder) {
 }
 
 async function persistToGridFS(file, folder) {
+    await ensureDbConnection()
     const bucket = getGridFSBucket()
     const fileName = `${folder}/${randomUUID()}_${sanitizeFileName(file.originalname)}`
 
@@ -115,8 +136,9 @@ async function persistToGridFS(file, folder) {
 
         uploadStream.on('error', reject)
         uploadStream.on('finish', () => {
-            const relative = `/media/files/${uploadStream.id.toString()}`
-            resolve(toAbsoluteMediaUrl(relative))
+            const ext = MIME_TO_EXT[contentType] || '.jpg'
+            const relative = `/media/files/${uploadStream.id.toString()}${ext}`
+            resolve(relative)
         })
 
         Readable.from(file.buffer).pipe(uploadStream)
@@ -175,7 +197,7 @@ export async function persistUploadedFiles(files, folder = 'images') {
 }
 
 function parseGridFSId(imagePath) {
-    const match = imagePath?.match(/\/media\/files\/([a-f0-9]{24})/i)
+    const match = imagePath?.match(/\/media\/files\/([a-f0-9]{24})(?:\.[a-z]+)?/i)
     return match?.[1] ?? null
 }
 

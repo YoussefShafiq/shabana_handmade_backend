@@ -14,13 +14,10 @@ import { productRouter } from "./Modules/product/product.controller.js";
 import { categoryRouter } from "./Modules/category/category.controller.js";
 import mediaRouter from "./Modules/media/media.controller.js";
 
-
-
-export default async function bootstrap() {
+export async function createApp() {
     const app = express();
     await testDbConncection()
     await testRedisConnection()
-
 
     app.use(
         express.json(),
@@ -37,16 +34,27 @@ export default async function bootstrap() {
     app.use('/home', homeRouter)
     app.use('/product', productRouter)
     app.use('/category', categoryRouter)
-    app.use(globalErrorHandling)
 
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    })
-
-    app.all('*d', (req, res) => {
+    app.all('*', (req, res) => {
         return res.status(400).json({
             success: false,
             message: 'invalid route or method'
         })
     })
+
+    app.use(globalErrorHandling)
+
+    return app
+}
+
+export default async function bootstrap() {
+    const app = await createApp()
+
+    if (!process.env.VERCEL) {
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        })
+    }
+
+    return app
 }
