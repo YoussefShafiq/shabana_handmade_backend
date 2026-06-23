@@ -31,3 +31,9 @@ export const EMAIL_PASS = process.env.EMAIL_PASS || ''
 export const WEB_CLIENT_ID = process.env.WEB_CLIENT_ID || ''
 
 export const BLOB_READ_WRITE_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || ''
+
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || ''
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || ''
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET || ''
+
+export const API_PUBLIC_URL = process.env.API_PUBLIC_URL || ''

@@ -25,7 +25,9 @@ export default async function bootstrap() {
     app.use(
         express.json(),
         cors(),
-        helmet()
+        helmet({
+            crossOriginResourcePolicy: { policy: 'cross-origin' },
+        })
     )
     app.use('/uploads', express.static(path.resolve('./uploads')))
     app.use('/media', mediaRouter)
