@@ -1,4 +1,5 @@
 import CategoryModel from "../../DB/Models/category.model.js"
+import { deleteOne } from "../../DB/Repository/delete.repo.js"
 import { find, findById, findOne } from "../../DB/Repository/get.repo.js"
 import { insertOne } from "../../DB/Repository/insert.repo.js"
 import { findByIdAndUpdate } from "../../DB/Repository/update.repo.js"
@@ -6,6 +7,11 @@ import { conflictException, notFoundException } from "../../utils/response/failR
 
 export async function getAllCategories() {
     const categories = await find(CategoryModel)
+    return categories
+}
+
+export async function getPublicCategories() {
+    const categories = await CategoryModel.find({ isActive: true })
     return categories
 }
 

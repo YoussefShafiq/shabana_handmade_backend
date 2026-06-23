@@ -40,6 +40,11 @@ export default function uploadLocal(folderName) {
     return multer({ storage: destination })
 }
 
+export function getUploadPublicPath(file, folderName) {
+    if (!file) return null
+    return file.finalDist || `/uploads/${folderName}/${file.filename}`
+}
+
 export function changeDir(oldPath, newDir) {
     const oldPathResolved = path.resolve('.' + oldPath);
     const fileName = path.basename(oldPathResolved);

@@ -2,10 +2,15 @@ import { Router } from "express";
 import { authentication } from "../../Middlewares/authentication.middleware.js";
 import { createCategorySchema, deleteCategorySchema, updateCategorySchema } from "../../utils/validationSchemas/category.schema.js";
 import { validation } from "../../Middlewares/validation.middleware.js";
-import { createCategory, deleteCategory, getAllCategories, toggleActivation, updateCategory } from "./category.service.js";
+import { createCategory, deleteCategory, getAllCategories, getPublicCategories, toggleActivation, updateCategory } from "./category.service.js";
 import successResponse from "../../utils/response/successResponse.js";
 
 export const categoryRouter = Router()
+
+categoryRouter.get('/public', async (req, res) => {
+    const categories = await getPublicCategories()
+    return successResponse({ res, data: categories, message: 'Categories fetched successfully', statusCode: 200 })
+})
 
 categoryRouter.get('', authentication(), async (req, res) => {
     const categories = await getAllCategories()

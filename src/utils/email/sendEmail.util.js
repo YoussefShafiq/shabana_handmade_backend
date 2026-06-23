@@ -212,7 +212,7 @@ export const sendEmail = async (email, otp, subject) => {
 };
 
 
-export const sendContactEmail = async (name, company, email, phone, serviceType, message) => {
+export const sendContactEmail = async ({ name, email, phone, productName, message }) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -223,13 +223,14 @@ export const sendContactEmail = async (name, company, email, phone, serviceType,
   await transporter.sendMail({
     from: EMAIL_USER,
     to: ['shafek.business@gmail.com', 'youssefk.business@gmail.com'],
-    subject: 'New Contact Message from ' + email,
+    subject: `New contact message from ${name}`,
     html: `
-      <h1>New Contact Message from ${name}</h1>
-      <p>Name: ${name}</p>
-      <p>Company: ${company}</p>
-      <p>Phone: ${phone}</p>
-      <p>Service Type: ${serviceType}</p>
-      <p>Message: ${message}</p>`
+      <h1>New contact message</h1>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email || '—'}</p>
+      <p><strong>Phone:</strong> ${phone || '—'}</p>
+      <p><strong>Product:</strong> ${productName || '—'}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>`
   })
 }

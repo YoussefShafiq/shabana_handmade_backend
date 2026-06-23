@@ -43,3 +43,12 @@ export const deleteProductSchema = {
         id: commonValidation.id.required(),
     }).required(),
 }
+
+export const deleteProductImageSchema = {
+    params: Joi.object({
+        id: commonValidation.id.required(),
+    }).required(),
+    body: Joi.object({
+        image: Joi.string().required(),
+    }).required(),
+}

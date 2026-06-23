@@ -3,28 +3,29 @@ import { model, Schema } from "mongoose";
 const contactSchema = new Schema({
     name: {
         type: String,
-        required: true
-    },
-    company: {
-        type: String,
-        required: true
+        required: true,
+        trim: true,
     },
     email: {
         type: String,
-        required: true
+        trim: true,
+        default: null,
     },
     phone: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
     },
-    serviceType: {
+    productName: {
         type: String,
-        required: true
+        trim: true,
+        default: null,
     },
     message: {
         type: String,
-        required: true
-    }
+        required: true,
+        trim: true,
+    },
 }, {
     timestamps: true,
     virtuals: true,
